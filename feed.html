@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TwitterMe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="feed-container">
+        <div class="profile-info">
+            <img id="profileImageDisplay" src="" alt="Profile Picture">
+            <h2 id="displayName"></h2>
+            <p id="displayBirthday"></p>
+            <p id="displayBio"></p>
+            <p id="displayQuote"></p>
+        </div>
+        <div class="tweet-input">
+            <textarea id="tweetText" placeholder="What's on your mind?"></textarea><br>
+            <button id="postTweet">Tweet</button>
+        </div>
+        <div class="tweets" id="tweetContainer">
+        </div>
+    </div>
+    <script src="feed.js"></script>
+</body>
+</html>
