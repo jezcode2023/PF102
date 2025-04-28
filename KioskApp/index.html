@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cat Cafe Kiosk</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fffbea;
+    }
+    .page {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .welcome-page {
+      background-color: #fcd5ce;
+    }
+    .category-page {
+      background-color: #d8e2dc;
+    }
+    .checkout-page {
+      background-color: #f1d0b8;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .start-button, .back-button, .cart-button, .checkout-button, .payment-button {
+      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      background-color: #6d6875;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .category-tile {
+      background-color: #b5ead7;
+      width: 150px;
+      height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.3s;
+    }
+    .category-tile:hover {
+      transform: scale(1.05);
+    }
+    .category-tile img {
+      width: 40px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .paw-logo {
+      width: 100px;
+      margin-bottom: 1.5rem;
+    }
+    .menu-list, .order-list {
+      list-style: none;
+      padding: 0;
+    }
+    .menu-list li, .order-list li {
+      margin: 10px 0;
+      font-size: 1.2rem;
+    }
+    .qty-input {
+      width: 50px;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+    }
+    .order-item span {
+      font-size: 1.2rem;
+    }
+    .payment-methods {
+      margin-top: 20px;
+    }
+    .receipt {
+      background-color: white;
+      padding: 20px;
+      width: 50%;
+      margin-top: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: left;
+      font-family: monospace;
+    }
+    .receipt h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .receipt .total {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .receipt .order-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+    }
+    .receipt .order-item span {
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Welcome Page -->
+  <div class="page welcome-page" id="welcomePage">
+    <img src="pawlogo.png" alt="Paw Logo" class="paw-logo" />
+    <h1>Welcome to Cat Cafe</h1>
+    <button class="start-button" onclick="goToCategories()">Dine In</button>
+    <button class="start-button" onclick="goToCategories()">Take Out</button>
+  </div>
+
+  <!-- Categories Page -->
+  <div class="page category-page" id="categoryPage">
+    <img src="pawlogo.png" alt="Paw Logo" class="paw-logo" />
+    <h1>Choose a Category</h1>
+    <div class="category-grid">
+      <div class="category-tile" onclick="goToMenu('coffeeMenu')">Coffees <img src="bev.png" alt="Paw" /></div>
+      <div class="category-tile" onclick="goToMenu('mainsMenu')">Mains <img src="meals.png" alt="Paw" /></div>
+      <div class="category-tile" onclick="goToMenu('snacksMenu')">Snacks <img src="snack.png" alt="Paw" /></div>
+      <div class="category-tile" onclick="goToMenu('dessertMenu')">Dessert <img src="dessert.png" alt="Paw" /></div>
+    </div>
+    <button class="cart-button" onclick="goToCart()">Cart (<span id="cartCount">0</span>)</button>
+  </div>
+
+  <!-- Menus with quantity and Add to Cart button -->
+  <div class="page" id="coffeeMenu">
+    <h1>Coffee Menu</h1>
+    <ul class="menu-list" id="coffeeList"></ul>
+    <button class="back-button" onclick="goToCategories()">Back</button>
+  </div>
+
+  <div class="page" id="mainsMenu">
+    <h1>Mains Menu</h1>
+    <ul class="menu-list" id="mainsList"></ul>
+    <button class="back-button" onclick="goToCategories()">Back</button>
+  </div>
+
+  <div class="page" id="snacksMenu">
+    <h1>Snacks Menu</h1>
+    <ul class="menu-list" id="snacksList"></ul>
+    <button class="back-button" onclick="goToCategories()">Back</button>
+  </div>
+
+  <div class="page" id="dessertMenu">
+    <h1>Dessert Menu</h1>
+    <ul class="menu-list" id="dessertList"></ul>
+    <button class="back-button" onclick="goToCategories()">Back</button>
+  </div>
+
+  <!-- Checkout Page -->
+  <div class="page checkout-page" id="checkoutPage">
+    <h1>Checkout</h1>
+    <ul class="order-list" id="orderList"></ul>
+    <div class="payment-methods">
+      <h2>Select Payment Method:</h2>
+      <button class="payment-button" onclick="selectPayment('G-cash')">E-wallet</button>
+      <button class="payment-button" onclick="selectPayment('Banks')">Banks</button>
+      <button class="payment-button" onclick="selectPayment('Cash')">Cash</button>
+    </div>
+    <button class="checkout-button" onclick="placeOrder()">Place Order</button>
+    <button class="back-button" onclick="goToCategories()">Back to Categories</button>
+  </div>
+
+  <!-- Digital Receipt Page -->
+  <div class="page" id="receiptPage">
+    <div class="receipt" id="receipt">
+      <h2>Cat Cafe Receipt</h2>
+      <div id="receiptItems"></div>
+      <div class="total" id="totalAmount"></div>
+      <button class="back-button" onclick="goToCategories()">Back to Menu</button>
+    </div>
+  </div>
+
+  <script>
+    const welcomePage = document.getElementById('welcomePage');
+    const categoryPage = document.getElementById('categoryPage');
+    const cartCount = document.getElementById('cartCount');
+    const orderList = document.getElementById('orderList');
+    const receiptPage = document.getElementById('receiptPage');
+    const receiptItems = document.getElementById('receiptItems');
+    const totalAmount = document.getElementById('totalAmount');
+
+    // Updated menu with prices
+    const menus = {
+      coffee: [
+        { name: 'Catspresso', price: 2.5 },
+        { name: 'Catco (choco)', price: 4.0 },
+        { name: 'Catnish Latte', price: 4.5 },
+        { name: 'Catchiatto', price: 5.0 },
+        { name: 'Catmocha', price: 4.75 },
+        { name: 'Wintermelon Milktea', price: 4.0 },
+        { name: 'Taro Milktea', price: 4.25 },
+        { name: 'Lemonade', price: 3.0 },
+        { name: 'Buko Juice', price: 3.5 },
+        { name: 'Cattish Frappe', price: 5.0 },
+        { name: 'Coke', price: 1.5 },
+        { name: 'Sprite', price: 1.5 }
+      ],
+      mains: [
+        { name: 'Pesto', price: 7.0 },
+        { name: 'Carbonara', price: 7.5 },
+        { name: 'Spaghetti', price: 6.5 },
+        { name: 'Burger', price: 5.0 },
+        { name: 'Chicken Tenders', price: 6.0 },
+        { name: 'Ramen', price: 8.0 }
+      ],
+      snacks: [
+        { name: 'Cookies', price: 2.5 },
+        { name: 'Croissant', price: 3.0 },
+        { name: 'Cheesecake', price: 4.5 },
+        { name: 'Muffins', price: 3.0 },
+        { name: 'Donuts', price: 2.0 }
+      ],
+      dessert: [
+        { name: 'Choco Icecream', price: 2.5 },
+        { name: 'Strawberry Icecream', price: 2.5 },
+        { name: 'Vanilla Icecream', price: 2.5 },
+        { name: 'Mango Float', price: 3.5 },
+        { name: 'Leche Flan', price: 3.0 }
+      ]
+    };
+
+    const cart = [];
+    let selectedPaymentMethod = '';
+
+    // Render menu items with prices
+    function renderMenu(category, listId) {
+      const list = document.getElementById(listId);
+      list.innerHTML = '';
+      menus[category].forEach((item, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          ${item.name} - $${item.price.toFixed(2)} 
+          <input id="qty-${category}-${i}" class="qty-input" type="number" min="1" value="1">
+          <button onclick="addToCart('${item.name}', ${item.price}, getQty('${category}-${i}'))">Add to Cart</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    function goToCategories() {
+      document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+      categoryPage.style.display = 'flex';
+    }
+
+    function goToMenu(menuId) {
+      document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+      document.getElementById(menuId).style.display = 'flex';
+    }
+
+    function getQty(id) {
+      return parseInt(document.getElementById(`qty-${id}`).value);
+    }
+
+    function addToCart(item, price, qty) {
+      for (let i = 0; i < qty; i++) {
+        cart.push({ item, price });
+      }
+      cartCount.innerText = cart.length;
+    }
+
+    function goToCart() {
+      document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+      const uniqueItems = [...new Set(cart.map(c => c.item))];
+      orderList.innerHTML = '';
+      uniqueItems.forEach(item => {
+        const quantity = cart.filter(c => c.item === item).length;
+        const li = document.createElement('li');
+        li.classList.add('order-item');
+        const price = cart.find(c => c.item === item).price;
+        const total = price * quantity;
+        li.innerHTML = `${item} x${quantity} - $${total.toFixed(2)}`;
+        orderList.appendChild(li);
+      });
+      document.getElementById('checkoutPage').style.display = 'flex';
+    }
+
+    function selectPayment(method) {
+      selectedPaymentMethod = method;
+      alert(`Payment Method Selected: ${method}`);
+    }
+
+    function placeOrder() {
+      if (!selectedPaymentMethod) {
+        alert('Please select a payment method!');
+        return;
+      }
+
+      // Prepare receipt details
+      let totalPrice = 0;
+      const uniqueItems = [...new Set(cart.map(c => c.item))];
+      receiptItems.innerHTML = '';
+
+      uniqueItems.forEach(item => {
+        const quantity = cart.filter(c => c.item === item).length;
+        const price = cart.find(c => c.item === item).price;
+        const li = document.createElement('div');
+        li.classList.add('order-item');
+        const total = price * quantity;
+        li.innerHTML = `${item} x${quantity} - $${total.toFixed(2)}`;
+        receiptItems.appendChild(li);
+
+        totalPrice += total;
+      });
+
+      totalAmount.innerHTML = `Total Paid: $${totalPrice.toFixed(2)}`;
+
+      // Show receipt page
+      document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+      receiptPage.style.display = 'flex';
+
+      cart.length = 0;  // Clear cart after placing order
+      cartCount.innerText = cart.length;
+    }
+
+    // Initial rendering of all menus
+    renderMenu('coffee', 'coffeeList');
+    renderMenu('mains', 'mainsList');
+    renderMenu('snacks', 'snacksList');
+    renderMenu('dessert', 'dessertList');
+
+    welcomePage.style.display = 'flex';
+  </script>
+</body>
+</html>
